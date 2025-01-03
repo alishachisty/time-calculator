@@ -1,14 +1,32 @@
+// Clear input value when clicked if it's 0
+document.addEventListener('DOMContentLoaded', function() {
+    const numberInputs = document.querySelectorAll('input[type="number"]');
+    numberInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            if (this.value === '0') {
+                this.value = '';
+            }
+        });
+        
+        input.addEventListener('blur', function() {
+            if (this.value === '') {
+                this.value = '0';
+            }
+        });
+    });
+});
+
 function calculateTime() {
     // Get input values
-    let startHour = parseInt(document.getElementById('startHour').value) || 0;
+    let startHour = parseInt(document.getElementById('startHour').value);
     let startMinute = parseInt(document.getElementById('startMinute').value) || 0;
     let addHours = parseInt(document.getElementById('addHours').value) || 0;
     let addMinutes = parseInt(document.getElementById('addMinutes').value) || 0;
     let ampm = document.getElementById('ampm').value;
 
     // Validate inputs
-    if (startHour < 1 || startHour > 12) {
-        alert("Start hour must be between 1 and 12");
+    if (!startHour || startHour < 1 || startHour > 12) {
+        alert("Please enter a valid start hour between 1 and 12");
         return;
     }
     if (startMinute < 0 || startMinute > 59) {
@@ -16,46 +34,43 @@ function calculateTime() {
         return;
     }
 
-    // Convert to 24 hour format
+    // Convert to minutes since midnight
+    let totalMinutes = startMinute + addMinutes;
+    let totalHours = startHour + addHours;
+
+    // Add hour if minutes overflow
+    if (totalMinutes >= 60) {
+        totalHours += Math.floor(totalMinutes / 60);
+        totalMinutes = totalMinutes % 60;
+    }
+
+    // Adjust hours based on AM/PM
     if (ampm === "PM" && startHour !== 12) {
-        startHour += 12;
+        totalHours += 12;
     }
     if (ampm === "AM" && startHour === 12) {
-        startHour = 0;
+        totalHours = totalHours - 12;
     }
 
-    // Calculate total minutes
-    let totalMinutes = (startHour * 60 + startMinute) + (addHours * 60 + addMinutes);
-
-    // Convert back to hours and minutes
-    let newHours = Math.floor(totalMinutes / 60) % 24;
-    let newMinutes = totalMinutes % 60;
-
-    // Convert back to 12 hour format
-    let newAMPM = "AM";
-    if (newHours >= 12) {
-        newAMPM = "PM";
-        if (newHours > 12) {
-            newHours -= 12;
-        }
-    }
-    if (newHours === 0) {
-        newHours = 12;
-    }
+    // Calculate final hours and AM/PM
+    totalHours = totalHours % 24;
+    let finalHours = totalHours % 12;
+    finalHours = finalHours === 0 ? 12 : finalHours;
+    let finalAMPM = totalHours >= 12 ? "PM" : "AM";
 
     // Display result
     document.getElementById('newTime').textContent = 
-        `${newHours}:${newMinutes.toString().padStart(2, '0')} ${newAMPM}`;
+        `${finalHours}:${totalMinutes.toString().padStart(2, '0')} ${finalAMPM}`;
 }
 
 function resetForm() {
-    // Reset all input fields
     document.getElementById('startHour').value = '';
     document.getElementById('startMinute').value = '';
     document.getElementById('addHours').value = '0';
     document.getElementById('addMinutes').value = '0';
     document.getElementById('ampm').value = 'AM';
     document.getElementById('newTime').textContent = '';
+}
 
 
 
