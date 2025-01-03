@@ -71,9 +71,22 @@
 
         .result {
             text-align: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
             border-top: 1px solid #ddd;
+        }
+
+        .result strong {
+            font-size: 2rem; /* Larger "New Time:" label */
+            color: #4CAF50;
+        }
+
+        .result #newTime {
+            font-size: 3rem; /* Larger resulting value */
+            font-weight: bold;
+            color: #333;
+            display: block;
+            margin-top: 1rem;
         }
     </style>
 </head>
@@ -117,9 +130,11 @@
         </button>
 
         <div class="result">
-            <strong>New Time: </strong><span id="newTime"></span>
+            <strong>New Time:</strong>
+            <span id="newTime">--</span>
         </div>
     </div>
     <script src="script.js"></script>
 </body>
 </html>
+
