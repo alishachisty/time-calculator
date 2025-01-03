@@ -33,3 +33,4 @@ function calculateNewTime() {
     document.getElementById('result').textContent = `${finalHour}:${finalMinute} ${finalAmPm}`;
 }
 
+
