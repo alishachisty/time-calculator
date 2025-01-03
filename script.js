@@ -1,28 +1,35 @@
-// Function to display current time
-function updateCurrentTime() {
-    const currentTimeSpan = document.getElementById('currentTime');
-    const now = new Date();
-    currentTimeSpan.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
+function calculateNewTime() {
+    const startHour = parseInt(document.getElementById('startHourInput').value);
+    const startMinute = parseInt(document.getElementById('startMinuteInput').value);
+    const amPm = document.getElementById('amPmInput').value;
+    const addHours = parseInt(document.getElementById('addHoursInput').value) || 0;
+    const addMinutes = parseInt(document.getElementById('addMinutesInput').value) || 0;
 
-// Function to calculate the new time
-function calculateTime() {
-    const hoursInput = document.getElementById('hoursInput').value;
-    const minutesInput = document.getElementById('minutesInput').value;
-    const resultSpan = document.getElementById('result');
-
-    if (!hoursInput && !minutesInput) {
-        resultSpan.textContent = 'Please enter hours or minutes!';
+    if (isNaN(startHour) || isNaN(startMinute) || startHour < 1 || startHour > 12 || startMinute < 0 || startMinute > 59) {
+        document.getElementById('result').textContent = 'Please enter a valid start time.';
         return;
     }
 
-    const now = new Date();
-    const addedTime = new Date(now.getTime());
-    addedTime.setHours(now.getHours() + parseInt(hoursInput || 0));
-    addedTime.setMinutes(now.getMinutes() + parseInt(minutesInput || 0));
+    // Convert start time to a 24-hour format for easier calculation
+    let totalHours = amPm === 'PM' && startHour !== 12 ? startHour + 12 : startHour;
+    if (amPm === 'AM' && startHour === 12) totalHours = 0; // Handle 12 AM as 0 hours
+    let totalMinutes = startMinute;
 
-    resultSpan.textContent = addedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    // Add the inputted hours and minutes
+    totalHours += addHours;
+    totalMinutes += addMinutes;
+
+    // Handle overflow of minutes into hours
+    totalHours += Math.floor(totalMinutes / 60);
+    totalMinutes %= 60;
+
+    // Handle overflow of hours into AM/PM cycles
+    const finalAmPm = totalHours >= 12 && totalHours < 24 ? 'PM' : 'AM';
+    totalHours %= 24;
+    const finalHour = totalHours === 0 ? 12 : totalHours > 12 ? totalHours - 12 : totalHours;
+
+    // Display the result in regular time format
+    const finalMinute = totalMinutes.toString().padStart(2, '0');
+    document.getElementById('result').textContent = `${finalHour}:${finalMinute} ${finalAmPm}`;
 }
 
-// Update the current time every second
-setInterval(updateCurrentTime, 1000);
